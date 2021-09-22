@@ -97,20 +97,26 @@ class Tokens extends Component {
         if (this.state.showAddressBar) {
             address_bar = <AddAddress submitAddress={this.submitAddress} />
         } else {
-            address_bar = <h4>{this.state.userAddress}</h4>
-        }
-        return (
+            address_bar = (
             <div>
-                {address_bar}
+                <h4>{this.state.userAddress}</h4>
                 <h2>You own: </h2>
                 {bals.map((token) => {                                                
                     return <SingleToken name={token.name} symbol={token.symbol} balance={token.balance} />                                                                                                         
                 })}
                 
                 <EnterToken postNewContract={this.postNewContract}/>
+                <br/>
                 <form onSubmit={this.onCheckBoxChange}>                    
                     <input type="submit" name="hidezero" value={this.state.hideZeroBals ? "Unhide Zero Balances" : "Hide Zero Balances"}  />
                 </form>
+            </div>                
+            )
+        }
+        return (
+            <div>
+                {address_bar}
+                
             </div>
         )
     }
