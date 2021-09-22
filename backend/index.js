@@ -3,15 +3,19 @@ var app = express();
 const server = require('http').createServer(app);
 const path = require('path');
 const PORT = 5000;
-const cors = require('cors');
+const ethereum_queries = require('./ethereum_queries')
 
 app.use(express.json());
-// app.use(cors);
-app.get('/api/eth', (req, res) => {
-    res.set('Access-Control-Allow-Origin', '*');
-    res.json({value: 100});
-})
 
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
+
+app.get('/api/:id', ethereum_queries.ethereum_get);
+
+app.post('/api', ethereum_queries.ethereum_post)
 
 // if route doesn't resolve to an API call, respond with react
 app.get('*', (req, res) => {
