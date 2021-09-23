@@ -19,8 +19,20 @@ class Tokens extends Component {
         this.submitAddress = this.submitAddress.bind(this);        
     }
 
-    componentDidMount = () => {
-        this.getTokenBalances(this.state.userAddress);
+    componentDidMount = async () => {
+        if(window.ethereum) {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' }); 
+            this.setState({
+                userAddress: accounts[0], 
+                showAddressBar: !this.state.showAddressBar
+            });
+
+            this.getTokenBalances(accounts[0]);
+        } else {
+            this.getTokenBalances(this.state.userAddress)
+        }
+        
+        
     }
 
     getTokenBalances = (address) => {                
@@ -50,7 +62,8 @@ class Tokens extends Component {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                'contract': newContract
+                'contract': newContract, 
+                'id': this.state.userAddress
             })
         }
         fetch('http://localhost:5000/api', postOptions)
@@ -61,6 +74,7 @@ class Tokens extends Component {
             });
         })
         .catch((err) => {
+            console.error(err);
             this.setState({
                 tokens: []
             })
@@ -83,7 +97,7 @@ class Tokens extends Component {
     }        
 
     render () {        
-        
+
         let bals;
         if (this.state.hideZeroBals) {
             bals = this.state.tokens.filter((token) => {

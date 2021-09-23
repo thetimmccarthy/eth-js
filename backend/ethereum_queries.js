@@ -6,7 +6,10 @@ require('dotenv').config();
 const rpcURL = process.env.INFURA_URL;
 const web3 = new Web3(rpcURL);
 
-let userContracts = ['0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5', '0xdac17f958d2ee523a2206206994597c13d831ec7']
+let userContracts = new Set();
+userContracts.add('0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5')
+userContracts.add('0xdac17f958d2ee523a2206206994597c13d831ec7')
+
 
 // Controllers for routes 
 const ethereum_get = async (req, res) => {
@@ -20,18 +23,18 @@ const ethereum_post = async (req, res) => {
     res.set('Access-Control-Allow-Origin', '*');
     let newContract = req.body.contract;
     addContract(newContract);
-    let balances = await readUserBalances(address);
+    let userAddress = req.body.id;    
+    let balances = await readUserBalances(userAddress);
     res.json(balances);
 }
 
-
 // Helper functions for route controllers
-const readUserBalances = async (address) => {        
+const readUserBalances = async (address) => {            
     userBalances = []
     let eth_balance = await web3.eth.getBalance(address);
     userBalances.push({'symbol': 'ETH', 'balance': web3.utils.fromWei(eth_balance, 'ether'), 'name': 'Ethereum' })
-    for (let i=0; i < userContracts.length; i++) {
-        let contract = new web3.eth.Contract(abi, userContracts[i]);        
+    for (let c of userContracts) {        
+        let contract = new web3.eth.Contract(abi, c);        
         let balance = await getBalanceOf(address, contract)
         let symbol = await getSymbolOf(contract);
         let name = await getNameOf(contract);
@@ -42,7 +45,7 @@ const readUserBalances = async (address) => {
 }
 
 const addContract = (contract) => {
-    userContracts.push(contract);
+    userContracts.add(contract);
 }
 
 const getBalanceOf = async (address, contract) => {
