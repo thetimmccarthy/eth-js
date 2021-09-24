@@ -29,11 +29,17 @@ class EnterToken extends Component {
     submitNewContract = (event) => {
         event.preventDefault();        
         let addedContract = this.state.contract;        
-        this.props.postNewContract(addedContract);
-        this.setState({
-            addNew: !this.state.addNew,
-            contract: ''
-        });
+        if (addedContract === '') {
+            this.setState({
+                addNew: !this.state.addNew
+            });
+        } else {
+            this.props.postNewContract(addedContract);
+            this.setState({
+                addNew: !this.state.addNew,
+                contract: ''
+            });
+        }
     }
     
     render () {

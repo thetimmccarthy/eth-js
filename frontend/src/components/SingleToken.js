@@ -14,6 +14,7 @@ class Token extends Component {
         return (
             <div>
                 <h4>{this.props.balance} {this.props.symbol}</h4>
+                <p>${this.props.usd}</p>
             </div>
         )
     }

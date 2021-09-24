@@ -115,8 +115,14 @@ class Tokens extends Component {
             <div>
                 <h4>{this.state.userAddress}</h4>
                 <h2>You own: </h2>
-                {bals.map((token) => {                                                
-                    return <SingleToken name={token.name} symbol={token.symbol} balance={token.balance} />                                                                                                         
+                {bals.map((token) => {                            
+                    let bal = parseFloat(token.balance);
+                    bal = bal / Math.pow(10, token.decimals);
+
+                    let usd_price = token.usd_price * bal;
+                    usd_price = usd_price.toFixed(2);      
+                    bal = bal.toFixed(4);         
+                    return <SingleToken name={token.name} symbol={token.symbol} balance={bal} usd={usd_price}/>                                                                                                         
                 })}
                 
                 <EnterToken postNewContract={this.postNewContract}/>
