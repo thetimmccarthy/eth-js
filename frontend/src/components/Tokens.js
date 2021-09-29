@@ -106,6 +106,15 @@ class Tokens extends Component {
         } else {
             bals = this.state.tokens;
         }        
+        let sum = 0;
+        bals.forEach(token => {
+            let bal = parseFloat(token.balance);
+            bal = bal / Math.pow(10, token.decimals);
+            let usd_price = parseFloat(token.usd_price) * bal;
+            usd_price = usd_price.toFixed(2);      
+            bal = bal.toFixed(4);                  
+            sum += parseFloat(usd_price);
+        });
 
         let address_bar;
         if (this.state.showAddressBar) {
@@ -114,14 +123,15 @@ class Tokens extends Component {
             address_bar = (
             <div>
                 <h4>{this.state.userAddress}</h4>
-                <h2>You own: </h2>
-                {bals.map((token) => {                            
+                <h2> Total USD Value: ${sum}</h2>
+                <h2>Tokens: </h2>
+                {
+                bals.map((token) => {                            
                     let bal = parseFloat(token.balance);
                     bal = bal / Math.pow(10, token.decimals);
-
-                    let usd_price = token.usd_price * bal;
+                    let usd_price = parseFloat(token.usd_price) * bal;
                     usd_price = usd_price.toFixed(2);      
-                    bal = bal.toFixed(4);         
+                    bal = bal.toFixed(4);   
                     return <SingleToken name={token.name} symbol={token.symbol} balance={bal} usd={usd_price}/>                                                                                                         
                 })}
                 

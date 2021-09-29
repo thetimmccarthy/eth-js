@@ -6,12 +6,14 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 const rpcURL = process.env.INFURA_URL;
 const web3 = new Web3(rpcURL);
 
+const contractModel = require('./db')
+
 // TODO: incorporate database to store contracts, should store every contract inputted by each user
 
 // This will eventuall be a database, will have to rewrite functions
-let userContracts = new Set();
-userContracts.add('0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5')
-userContracts.add('0xdac17f958d2ee523a2206206994597c13d831ec7')
+// let userContracts = new Set();
+// userContracts.add('0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5')
+// userContracts.add('0xdac17f958d2ee523a2206206994597c13d831ec7')
 
 const BASE_CURRENCY = 'usd'
 
@@ -28,8 +30,8 @@ const ethereum_get = async (req, res) => {
 const ethereum_post = async (req, res) => {
     res.set('Access-Control-Allow-Origin', '*');
     let newContract = req.body.contract;
-    addContract(newContract);
     let userAddress = req.body.id;    
+    addContract(newContract, userAddress);    
     asyncBalances(userAddress, req, res);
 }
 
@@ -62,33 +64,39 @@ const readUserBalances = async (address, our_contract, price, cb) => {
 }
 
 const asyncBalances = async (this_address, req, res) => {
-    let token_prices = await get_all_prices_usd(userContracts);    
-    console.log(token_prices)
-    async.map(userContracts, function(contract, cb) {        
-        let this_token_price = token_prices[contract][BASE_CURRENCY];            
-        let new_contract = new web3.eth.Contract(abi, contract);        
+    let userContracts = await contractModel.find({'userContract': this_address}, 'contractAddress').exec();
+    
+    userContracts = userContracts.map(token => {
+        return token.contractAddress;
+    });
+
+    let token_prices = await get_all_prices_usd(userContracts);        
+    
+    async.map(userContracts, function(contract, cb) {
+        let this_token_price = token_prices[contract][BASE_CURRENCY];
+        let new_contract = new web3.eth.Contract(abi, contract);   
         readUserBalances(this_address, new_contract, this_token_price, cb);
     }, async function(err, results){
         let eth_balance = await web3.eth.getBalance(this_address);
         eth = {'symbol': 'ETH', 'balance': eth_balance, 'decimals': 18, 'name': 'Ethereum', usd_price: token_prices['eth'][BASE_CURRENCY] }
         let x = [...results, eth]
-        console.log(x)
         res.json(x)
     })
 }
 
 /* ---------------- */
 
-const get_all_prices_usd = async (token_contracts) => {
-    token_contracts = Array.from(token_contracts);
-    const token_pairs = token_contracts.join(',');    
+const get_all_prices_usd = async (users_tokens) => {
+    // if using db then dont need to convert param to array, it will already be an array
+    // token_contracts = Array.from(token_contracts);    
+    const token_pairs = users_tokens.join(',');    
     const query = `contract_addresses=${token_pairs}&vs_currencies=${BASE_CURRENCY}`;
     const url = `https://api.coingecko.com/api/v3/simple/token_price/ethereum?${query}`;
     const response = await fetch(url);
     
     // dictionary of prices with contract address as key and {currency: price} as value
     const token_prices = await response.json();    
-    
+
     // get ETH price and add to dict
     let eth = await get_eth_price_usd();
     return {...token_prices, eth: eth['ethereum'] }
@@ -103,13 +111,16 @@ const get_eth_price_usd = async () => {
     const token_prices = await response.json();  
     return token_prices;
     
+
 }
 
-const addContract = (contract) => {
-    userContracts.add(contract);
+const addContract = async (contract, this_address) => {
+    // if using not using db, uncomment line below and comment out db method
+    // userContracts.add(contract);
+    let contractDetails = {userAddress: this_address, contractAddress: contract};
+    let newContract =  new contractModel(contractDetails);
+    await newContract.save()
 }
-
-
 
 const getBalanceOf = (address, contract, cb) => {
     contract.methods.balanceOf(address).call((err, bal) => {

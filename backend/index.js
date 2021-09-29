@@ -4,6 +4,14 @@ const server = require('http').createServer(app);
 const path = require('path');
 const PORT = 5000;
 const ethereum_queries = require('./ethereum_queries')
+const contractModel = require('./db')
+
+// Add MongoDB url to .env file
+const mongoose = require('mongoose')
+const mongodbstring = process.env.MONGO_DB;
+mongoose.connect(mongodbstring, {useNewUrlParser: true, useUnifiedTopology: true});
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'Mongo connnection error'));
 
 app.use(express.json());
 
