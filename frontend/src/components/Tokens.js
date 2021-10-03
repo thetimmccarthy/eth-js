@@ -115,16 +115,18 @@ class Tokens extends Component {
             bal = bal.toFixed(4);                  
             sum += parseFloat(usd_price);
         });
-
+        sum = sum.toFixed(2)
         let address_bar;
         if (this.state.showAddressBar) {
             address_bar = <AddAddress submitAddress={this.submitAddress} />
         } else {
             address_bar = (
             <div>
+                <h2>Welcome to your wallet!</h2>
                 <h4>{this.state.userAddress}</h4>
                 <h2> Total USD Value: ${sum}</h2>
                 <h2>Tokens: </h2>
+                {/* Below should probably be in seperate component 'AllTokens' that maps to SingleToken */}
                 {
                 bals.map((token) => {                            
                     let bal = parseFloat(token.balance);
@@ -145,8 +147,7 @@ class Tokens extends Component {
         }
         return (
             <div>
-                {address_bar}
-                
+                {address_bar}                
             </div>
         )
     }
