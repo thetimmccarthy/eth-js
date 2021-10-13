@@ -8,21 +8,13 @@ const web3 = new Web3(rpcURL);
 
 const contractModel = require('./db')
 
-// TODO: incorporate database to store contracts, should store every contract inputted by each user
-
-// This will eventuall be a database, will have to rewrite functions
-// let userContracts = new Set();
-// userContracts.add('0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5')
-// userContracts.add('0xdac17f958d2ee523a2206206994597c13d831ec7')
-
 const BASE_CURRENCY = 'usd'
 
 // Controllers for routes 
 const ethereum_get = async (req, res) => {
     res.set('Access-Control-Allow-Origin', '*');    
     let userAddress = req.params.id;    
-    // let balances = await readUserBalances(userAddress);    
-    // res.json(balances)
+
     asyncBalances(userAddress, req, res)
 
 }
@@ -162,16 +154,6 @@ const getDecimalsOf = (contract, cb) => {
     }); 
 }
 
-const getEthBalance = async (address, cb) => {
-    web3.eth.getBalance(address).then(bal => {        
-            let eth_balance = web3.utils.fromWei(bal, 'ether');
-            eth_balance = parseFloat(eth_balance);
-            return cb(null, eth_balance);            
-        })
-        .catch(err => {
-            return cb(err, null)
-        })    
-}
 
 module.exports = {
     ethereum_get,
