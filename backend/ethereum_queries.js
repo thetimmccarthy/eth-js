@@ -56,12 +56,8 @@ const readUserBalances = async (address, our_contract, price, cb) => {
 }
 
 const asyncBalances = async (this_address, req, res) => {
-    let userContracts = await contractModel.find({'userContract': this_address}, 'contractAddress').exec();
+    let userContracts = await contractModel.distinct('contractAddress', {'userContract': this_address}).exec();
     
-    userContracts = userContracts.map(token => {
-        return token.contractAddress;
-    });
-
     let token_prices = await get_all_prices_usd(userContracts);        
     
     async.map(userContracts, function(contract, cb) {
@@ -109,6 +105,7 @@ const get_eth_price_usd = async () => {
 const addContract = async (contract, this_address) => {
     // if using not using db, uncomment line below and comment out db method
     // userContracts.add(contract);
+
     let contractDetails = {userAddress: this_address, contractAddress: contract};
     let newContract =  new contractModel(contractDetails);
     await newContract.save()

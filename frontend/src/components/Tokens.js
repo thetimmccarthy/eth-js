@@ -122,9 +122,15 @@ class Tokens extends Component {
         } else {
             address_bar = (
             <div>
-                <h2>Welcome to your wallet!</h2>
-                <h4>{this.state.userAddress}</h4>
+                <h2>Welcome!</h2>
+                <h4>Address: {this.state.userAddress}</h4>
                 <h2> Total USD Value: ${sum}</h2>
+                <br/>
+                <EnterToken postNewContract={this.postNewContract}/>
+                <br/>
+                <form onSubmit={this.onCheckBoxChange}>                    
+                    <input type="submit" name="hidezero" value={this.state.hideZeroBals ? "Unhide Zero Balances" : "Hide Zero Balances"}  />
+                </form>
                 <h2>Tokens: </h2>
                 {/* Below should probably be in seperate component 'AllTokens' that maps to SingleToken */}
                 {
@@ -137,11 +143,11 @@ class Tokens extends Component {
                     return <SingleToken name={token.name} symbol={token.symbol} balance={bal} usd={usd_price}/>                                                                                                         
                 })}
                 
-                <EnterToken postNewContract={this.postNewContract}/>
-                <br/>
-                <form onSubmit={this.onCheckBoxChange}>                    
+                {/* <EnterToken postNewContract={this.postNewContract}/>
+                <br/> */}
+                {/* <form onSubmit={this.onCheckBoxChange}>                    
                     <input type="submit" name="hidezero" value={this.state.hideZeroBals ? "Unhide Zero Balances" : "Hide Zero Balances"}  />
-                </form>
+                </form> */}
             </div>                
             )
         }
