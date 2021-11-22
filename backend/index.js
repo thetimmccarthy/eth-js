@@ -27,7 +27,7 @@ app.post('/api', ethereum_queries.ethereum_post)
 
 // if route doesn't resolve to an API call, respond with react
 app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../frontend/public', 'index.html'));
+    res.sendFile(path.resolve(__dirname, '/../frontend/public', 'index.html'));
   });
 
 // tell server to listen on PORT
