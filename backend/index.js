@@ -2,7 +2,7 @@ const express = require('express');
 var app = express();
 const server = require('http').createServer(app);
 const path = require('path');
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 const ethereum_queries = require('./ethereum_queries')
 const contractModel = require('./db')
 
