@@ -2,6 +2,7 @@
 
 promise_practice.js
 .env
+package2.json
 # dependencies
 node_modules
 /.pnp
