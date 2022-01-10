@@ -36,7 +36,8 @@ class Tokens extends Component {
     }
 
     getTokenBalances = (address) => {                
-        let url = 'http://localhost:5000/api/' + address;        
+        // let url = 'http://localhost:5000/api/' + address;        
+        let url = '/api/' + address;        
         fetch(url)
           .then((res) => {      
           return res.json()            
